@@ -1,0 +1,45 @@
+syntax = "proto3";
+
+package proto;
+
+option go_package = "github.com/yourusername/agent-platform/proto";
+
+import "proto/common.proto";
+
+// Agent 注册信息
+message AgentRegister {
+  string agent_id = 1;
+  string hostname = 2;
+  string ip = 3;
+  string os = 4;
+  string arch = 5;
+  string version = 6;
+}
+
+// 心跳消息
+message Heartbeat {
+  string agent_id = 1;
+  Timestamp timestamp = 2;
+}
+
+// 从管理平台到 Agent 的消息
+message ServerMessage {
+  oneof message {
+    Response register_response = 1;
+    Response heartbeat_ack = 2;
+  }
+}
+
+// 从 Agent 到管理平台的消息
+message AgentMessage {
+  oneof message {
+    AgentRegister register = 1;
+    Heartbeat heartbeat = 2;
+  }
+}
+
+// Agent 服务定义
+service AgentService {
+  // 双向流连接
+  rpc Connect(stream AgentMessage) returns (stream ServerMessage);
+}

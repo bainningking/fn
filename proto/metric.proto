@@ -1,0 +1,21 @@
+syntax = "proto3";
+
+package proto;
+
+option go_package = "github.com/yourusername/agent-platform/proto";
+
+import "proto/common.proto";
+
+// 指标数据点
+message MetricPoint {
+  string name = 1;
+  double value = 2;
+  Timestamp timestamp = 3;
+  map<string, string> labels = 4;
+}
+
+// 批量指标数据
+message MetricBatch {
+  string agent_id = 1;
+  repeated MetricPoint metrics = 2;
+}

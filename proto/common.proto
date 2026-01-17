@@ -1,0 +1,18 @@
+syntax = "proto3";
+
+package proto;
+
+option go_package = "github.com/yourusername/agent-platform/proto";
+
+// 时间戳
+message Timestamp {
+  int64 seconds = 1;
+  int32 nanos = 2;
+}
+
+// 通用响应
+message Response {
+  bool success = 1;
+  string message = 2;
+  string error = 3;
+}
