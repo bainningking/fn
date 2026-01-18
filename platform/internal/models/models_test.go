@@ -25,3 +25,22 @@ func TestAgentModel(t *testing.T) {
 		t.Errorf("expected Status online, got %s", agent.Status)
 	}
 }
+
+func TestTaskModel(t *testing.T) {
+	task := &Task{
+		TaskID:   "task-001",
+		AgentID:  "agent-001",
+		Type:     "shell",
+		Script:   "echo 'hello'",
+		Timeout:  30,
+		Status:   "pending",
+	}
+
+	if task.TaskID != "task-001" {
+		t.Errorf("expected TaskID task-001, got %s", task.TaskID)
+	}
+
+	if task.Status != "pending" {
+		t.Errorf("expected Status pending, got %s", task.Status)
+	}
+}
