@@ -9,11 +9,13 @@ import (
 type Config struct {
 	Server   ServerConfig   `yaml:"server"`
 	Database DatabaseConfig `yaml:"database"`
+	Redis    RedisConfig    `yaml:"redis"`
+	Log      LogConfig      `yaml:"log"`
 }
 
 type ServerConfig struct {
-	GRPCPort int `yaml:"grpc_port"`
-	HTTPPort int `yaml:"http_port"`
+	GRPCPort string `yaml:"grpc_port"`
+	HTTPPort string `yaml:"http_port"`
 }
 
 type DatabaseConfig struct {
@@ -22,6 +24,19 @@ type DatabaseConfig struct {
 	User     string `yaml:"user"`
 	Password string `yaml:"password"`
 	DBName   string `yaml:"dbname"`
+}
+
+type RedisConfig struct {
+	Host     string `yaml:"host"`
+	Port     int    `yaml:"port"`
+	Password string `yaml:"password"`
+	DB       int    `yaml:"db"`
+}
+
+type LogConfig struct {
+	Level  string `yaml:"level"`
+	Format string `yaml:"format"`
+	Output string `yaml:"output"`
 }
 
 func LoadConfig(path string) (*Config, error) {

@@ -1,7 +1,7 @@
 package main
 
 import (
-	"fmt"
+	"flag"
 	"log"
 	"os"
 	"os/signal"
@@ -10,12 +10,15 @@ import (
 	"github.com/yourusername/agent-platform/platform/internal/api"
 	"github.com/yourusername/agent-platform/platform/internal/config"
 	"github.com/yourusername/agent-platform/platform/internal/database"
-	"github.com/yourusername/agent-platform/platform/internal/server"
+	grpcserver "github.com/yourusername/agent-platform/platform/internal/grpc"
 )
 
 func main() {
+	configPath := flag.String("config", "platform/config.yaml", "配置文件路径")
+	flag.Parse()
+
 	// 加载配置
-	cfg, err := config.LoadConfig("platform/config.yaml")
+	cfg, err := config.LoadConfig(*configPath)
 	if err != nil {
 		log.Fatalf("Failed to load config: %v", err)
 	}
@@ -36,11 +39,9 @@ func main() {
 	log.Println("Database connected successfully")
 
 	// 启动 gRPC 服务器
-	grpcAddr := fmt.Sprintf(":%d", cfg.Server.GRPCPort)
-	grpcServer := server.NewServer(grpcAddr, db)
-
+	grpcServer := grpcserver.NewServer(cfg.Server.GRPCPort, db)
 	go func() {
-		log.Printf("Starting gRPC server on %s", grpcAddr)
+		log.Printf("Starting gRPC server on %s", cfg.Server.GRPCPort)
 		if err := grpcServer.Start(); err != nil {
 			log.Fatalf("Failed to start gRPC server: %v", err)
 		}
@@ -49,8 +50,8 @@ func main() {
 	// 启动 HTTP API 服务器
 	router := api.SetupRouter(db)
 	go func() {
-		log.Println("Starting HTTP server on :8080")
-		if err := router.Run(":8080"); err != nil {
+		log.Printf("Starting HTTP server on %s", cfg.Server.HTTPPort)
+		if err := router.Run(cfg.Server.HTTPPort); err != nil {
 			log.Fatalf("Failed to start HTTP server: %v", err)
 		}
 	}()

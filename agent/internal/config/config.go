@@ -9,6 +9,7 @@ import (
 type Config struct {
 	Server ServerConfig `yaml:"server"`
 	Agent  AgentConfig  `yaml:"agent"`
+	Log    LogConfig    `yaml:"log"`
 }
 
 type ServerConfig struct {
@@ -19,6 +20,11 @@ type ServerConfig struct {
 type AgentConfig struct {
 	ID              string `yaml:"id"`
 	CollectInterval int    `yaml:"collect_interval"`
+}
+
+type LogConfig struct {
+	Level  string `yaml:"level"`
+	Output string `yaml:"output"`
 }
 
 func LoadConfig(path string) (*Config, error) {
