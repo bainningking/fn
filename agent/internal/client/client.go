@@ -8,24 +8,27 @@ import (
 
 	pb "github.com/yourusername/agent-platform/proto"
 	"github.com/yourusername/agent-platform/agent/internal/executor"
+	"github.com/yourusername/agent-platform/agent/internal/plugin"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 )
 
 type Client struct {
-	serverAddr string
-	useTLS     bool
-	agentID    string
-	conn       *grpc.ClientConn
-	executor   *executor.Executor
+	serverAddr    string
+	useTLS        bool
+	agentID       string
+	conn          *grpc.ClientConn
+	executor      *executor.Executor
+	pluginManager *plugin.Manager
 }
 
 func NewClient(serverAddr string, useTLS bool, agentID string) *Client {
 	return &Client{
-		serverAddr: serverAddr,
-		useTLS:     useTLS,
-		agentID:    agentID,
-		executor:   executor.NewExecutor(),
+		serverAddr:    serverAddr,
+		useTLS:        useTLS,
+		agentID:       agentID,
+		executor:      executor.NewExecutor(),
+		pluginManager: plugin.NewManager("/var/lib/agent/plugins"),
 	}
 }
 
@@ -79,6 +82,12 @@ func (c *Client) Run(ctx context.Context) error {
 			log.Printf("Registered successfully")
 		case *pb.ServerMessage_HeartbeatAck:
 			log.Printf("Heartbeat acknowledged")
+		case *pb.ServerMessage_InstallPlugin:
+			go c.handleInstallPlugin(ctx, stream, m.InstallPlugin)
+		case *pb.ServerMessage_UninstallPlugin:
+			go c.handleUninstallPlugin(ctx, stream, m.UninstallPlugin)
+		case *pb.ServerMessage_ListPlugins:
+			go c.handleListPlugins(ctx, stream, m.ListPlugins)
 		}
 	}
 }
@@ -120,6 +129,61 @@ func (c *Client) handleTask(ctx context.Context, stream pb.AgentService_ConnectC
 	}); err != nil {
 		log.Printf("Failed to send task result: %v", err)
 	}
+}
+
+func (c *Client) handleInstallPlugin(ctx context.Context, stream pb.AgentService_ConnectClient, req *pb.InstallPluginRequest) {
+	log.Printf("Installing plugin: %s", req.PluginName)
+
+	err := c.pluginManager.Load(req.PluginName)
+	if err == nil {
+		err = c.pluginManager.Start(req.PluginName)
+	}
+
+	response := &pb.InstallPluginResponse{
+		Success: err == nil,
+	}
+	if err != nil {
+		response.Error = err.Error()
+	}
+
+	stream.Send(&pb.AgentMessage{
+		Message: &pb.AgentMessage_InstallPluginResponse{
+			InstallPluginResponse: response,
+		},
+	})
+}
+
+func (c *Client) handleUninstallPlugin(ctx context.Context, stream pb.AgentService_ConnectClient, req *pb.UninstallPluginRequest) {
+	log.Printf("Uninstalling plugin: %s", req.PluginName)
+
+	err := c.pluginManager.Unload(req.PluginName)
+
+	response := &pb.UninstallPluginResponse{
+		Success: err == nil,
+	}
+	if err != nil {
+		response.Error = err.Error()
+	}
+
+	stream.Send(&pb.AgentMessage{
+		Message: &pb.AgentMessage_UninstallPluginResponse{
+			UninstallPluginResponse: response,
+		},
+	})
+}
+
+func (c *Client) handleListPlugins(ctx context.Context, stream pb.AgentService_ConnectClient, req *pb.ListPluginsRequest) {
+	log.Printf("Listing plugins")
+
+	plugins := c.pluginManager.List()
+
+	stream.Send(&pb.AgentMessage{
+		Message: &pb.AgentMessage_ListPluginsResponse{
+			ListPluginsResponse: &pb.ListPluginsResponse{
+				Plugins: plugins,
+			},
+		},
+	})
 }
 
 func (c *Client) Close() error {

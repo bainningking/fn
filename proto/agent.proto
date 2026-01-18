@@ -6,6 +6,7 @@ option go_package = "github.com/yourusername/agent-platform/proto";
 
 import "proto/common.proto";
 import "proto/task.proto";
+import "proto/plugin.proto";
 
 // Agent 注册信息
 message AgentRegister {
@@ -29,6 +30,9 @@ message ServerMessage {
     Response register_response = 1;
     Response heartbeat_ack = 2;
     TaskRequest task_request = 3;  // 新增：任务下发
+    InstallPluginRequest install_plugin = 4;  // 插件安装
+    UninstallPluginRequest uninstall_plugin = 5;  // 插件卸载
+    ListPluginsRequest list_plugins = 6;  // 列出插件
   }
 }
 
@@ -39,6 +43,9 @@ message AgentMessage {
     Heartbeat heartbeat = 2;
     TaskResult task_result = 3;  // 新增：任务结果
     TaskLog task_log = 4;  // 新增：任务日志
+    InstallPluginResponse install_plugin_response = 5;  // 插件安装响应
+    UninstallPluginResponse uninstall_plugin_response = 6;  // 插件卸载响应
+    ListPluginsResponse list_plugins_response = 7;  // 列出插件响应
   }
 }
 

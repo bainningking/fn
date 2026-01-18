@@ -47,6 +47,18 @@ func (h *AgentServiceHandler) Connect(stream pb.AgentService_ConnectServer) erro
 			if err := h.handleTaskLog(stream, m.TaskLog); err != nil {
 				log.Printf("Error handling task log: %v", err)
 			}
+		case *pb.AgentMessage_InstallPluginResponse:
+			if err := h.handleInstallPluginResponse(m.InstallPluginResponse); err != nil {
+				log.Printf("Error handling install plugin response: %v", err)
+			}
+		case *pb.AgentMessage_UninstallPluginResponse:
+			if err := h.handleUninstallPluginResponse(m.UninstallPluginResponse); err != nil {
+				log.Printf("Error handling uninstall plugin response: %v", err)
+			}
+		case *pb.AgentMessage_ListPluginsResponse:
+			if err := h.handleListPluginsResponse(m.ListPluginsResponse); err != nil {
+				log.Printf("Error handling list plugins response: %v", err)
+			}
 		}
 	}
 }
@@ -101,5 +113,20 @@ func (h *AgentServiceHandler) handleTaskResult(stream pb.AgentService_ConnectSer
 func (h *AgentServiceHandler) handleTaskLog(stream pb.AgentService_ConnectServer, taskLog *pb.TaskLog) error {
 	// 处理任务日志逻辑
 	log.Printf("Task %s log: %s", taskLog.TaskId, taskLog.Output)
+	return nil
+}
+
+func (h *AgentServiceHandler) handleInstallPluginResponse(response *pb.InstallPluginResponse) error {
+	log.Printf("Install plugin response: success=%v, message=%s", response.Success, response.Message)
+	return nil
+}
+
+func (h *AgentServiceHandler) handleUninstallPluginResponse(response *pb.UninstallPluginResponse) error {
+	log.Printf("Uninstall plugin response: success=%v, message=%s", response.Success, response.Message)
+	return nil
+}
+
+func (h *AgentServiceHandler) handleListPluginsResponse(response *pb.ListPluginsResponse) error {
+	log.Printf("List plugins response: %d plugins", len(response.Plugins))
 	return nil
 }

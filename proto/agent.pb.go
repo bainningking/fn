@@ -167,6 +167,9 @@ type ServerMessage struct {
 	//	*ServerMessage_RegisterResponse
 	//	*ServerMessage_HeartbeatAck
 	//	*ServerMessage_TaskRequest
+	//	*ServerMessage_InstallPlugin
+	//	*ServerMessage_UninstallPlugin
+	//	*ServerMessage_ListPlugins
 	Message       isServerMessage_Message `protobuf_oneof:"message"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
@@ -236,6 +239,33 @@ func (x *ServerMessage) GetTaskRequest() *TaskRequest {
 	return nil
 }
 
+func (x *ServerMessage) GetInstallPlugin() *InstallPluginRequest {
+	if x != nil {
+		if x, ok := x.Message.(*ServerMessage_InstallPlugin); ok {
+			return x.InstallPlugin
+		}
+	}
+	return nil
+}
+
+func (x *ServerMessage) GetUninstallPlugin() *UninstallPluginRequest {
+	if x != nil {
+		if x, ok := x.Message.(*ServerMessage_UninstallPlugin); ok {
+			return x.UninstallPlugin
+		}
+	}
+	return nil
+}
+
+func (x *ServerMessage) GetListPlugins() *ListPluginsRequest {
+	if x != nil {
+		if x, ok := x.Message.(*ServerMessage_ListPlugins); ok {
+			return x.ListPlugins
+		}
+	}
+	return nil
+}
+
 type isServerMessage_Message interface {
 	isServerMessage_Message()
 }
@@ -252,11 +282,29 @@ type ServerMessage_TaskRequest struct {
 	TaskRequest *TaskRequest `protobuf:"bytes,3,opt,name=task_request,json=taskRequest,proto3,oneof"` // 新增：任务下发
 }
 
+type ServerMessage_InstallPlugin struct {
+	InstallPlugin *InstallPluginRequest `protobuf:"bytes,4,opt,name=install_plugin,json=installPlugin,proto3,oneof"` // 插件安装
+}
+
+type ServerMessage_UninstallPlugin struct {
+	UninstallPlugin *UninstallPluginRequest `protobuf:"bytes,5,opt,name=uninstall_plugin,json=uninstallPlugin,proto3,oneof"` // 插件卸载
+}
+
+type ServerMessage_ListPlugins struct {
+	ListPlugins *ListPluginsRequest `protobuf:"bytes,6,opt,name=list_plugins,json=listPlugins,proto3,oneof"` // 列出插件
+}
+
 func (*ServerMessage_RegisterResponse) isServerMessage_Message() {}
 
 func (*ServerMessage_HeartbeatAck) isServerMessage_Message() {}
 
 func (*ServerMessage_TaskRequest) isServerMessage_Message() {}
+
+func (*ServerMessage_InstallPlugin) isServerMessage_Message() {}
+
+func (*ServerMessage_UninstallPlugin) isServerMessage_Message() {}
+
+func (*ServerMessage_ListPlugins) isServerMessage_Message() {}
 
 // 从 Agent 到管理平台的消息
 type AgentMessage struct {
@@ -267,6 +315,9 @@ type AgentMessage struct {
 	//	*AgentMessage_Heartbeat
 	//	*AgentMessage_TaskResult
 	//	*AgentMessage_TaskLog
+	//	*AgentMessage_InstallPluginResponse
+	//	*AgentMessage_UninstallPluginResponse
+	//	*AgentMessage_ListPluginsResponse
 	Message       isAgentMessage_Message `protobuf_oneof:"message"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
@@ -345,6 +396,33 @@ func (x *AgentMessage) GetTaskLog() *TaskLog {
 	return nil
 }
 
+func (x *AgentMessage) GetInstallPluginResponse() *InstallPluginResponse {
+	if x != nil {
+		if x, ok := x.Message.(*AgentMessage_InstallPluginResponse); ok {
+			return x.InstallPluginResponse
+		}
+	}
+	return nil
+}
+
+func (x *AgentMessage) GetUninstallPluginResponse() *UninstallPluginResponse {
+	if x != nil {
+		if x, ok := x.Message.(*AgentMessage_UninstallPluginResponse); ok {
+			return x.UninstallPluginResponse
+		}
+	}
+	return nil
+}
+
+func (x *AgentMessage) GetListPluginsResponse() *ListPluginsResponse {
+	if x != nil {
+		if x, ok := x.Message.(*AgentMessage_ListPluginsResponse); ok {
+			return x.ListPluginsResponse
+		}
+	}
+	return nil
+}
+
 type isAgentMessage_Message interface {
 	isAgentMessage_Message()
 }
@@ -365,6 +443,18 @@ type AgentMessage_TaskLog struct {
 	TaskLog *TaskLog `protobuf:"bytes,4,opt,name=task_log,json=taskLog,proto3,oneof"` // 新增：任务日志
 }
 
+type AgentMessage_InstallPluginResponse struct {
+	InstallPluginResponse *InstallPluginResponse `protobuf:"bytes,5,opt,name=install_plugin_response,json=installPluginResponse,proto3,oneof"` // 插件安装响应
+}
+
+type AgentMessage_UninstallPluginResponse struct {
+	UninstallPluginResponse *UninstallPluginResponse `protobuf:"bytes,6,opt,name=uninstall_plugin_response,json=uninstallPluginResponse,proto3,oneof"` // 插件卸载响应
+}
+
+type AgentMessage_ListPluginsResponse struct {
+	ListPluginsResponse *ListPluginsResponse `protobuf:"bytes,7,opt,name=list_plugins_response,json=listPluginsResponse,proto3,oneof"` // 列出插件响应
+}
+
 func (*AgentMessage_Register) isAgentMessage_Message() {}
 
 func (*AgentMessage_Heartbeat) isAgentMessage_Message() {}
@@ -373,11 +463,17 @@ func (*AgentMessage_TaskResult) isAgentMessage_Message() {}
 
 func (*AgentMessage_TaskLog) isAgentMessage_Message() {}
 
+func (*AgentMessage_InstallPluginResponse) isAgentMessage_Message() {}
+
+func (*AgentMessage_UninstallPluginResponse) isAgentMessage_Message() {}
+
+func (*AgentMessage_ListPluginsResponse) isAgentMessage_Message() {}
+
 var File_proto_agent_proto protoreflect.FileDescriptor
 
 const file_proto_agent_proto_rawDesc = "" +
 	"\n" +
-	"\x11proto/agent.proto\x12\x05proto\x1a\x12proto/common.proto\x1a\x10proto/task.proto\"\x94\x01\n" +
+	"\x11proto/agent.proto\x12\x05proto\x1a\x12proto/common.proto\x1a\x10proto/task.proto\x1a\x12proto/plugin.proto\"\x94\x01\n" +
 	"\rAgentRegister\x12\x19\n" +
 	"\bagent_id\x18\x01 \x01(\tR\aagentId\x12\x1a\n" +
 	"\bhostname\x18\x02 \x01(\tR\bhostname\x12\x0e\n" +
@@ -387,18 +483,24 @@ const file_proto_agent_proto_rawDesc = "" +
 	"\aversion\x18\x06 \x01(\tR\aversion\"V\n" +
 	"\tHeartbeat\x12\x19\n" +
 	"\bagent_id\x18\x01 \x01(\tR\aagentId\x12.\n" +
-	"\ttimestamp\x18\x02 \x01(\v2\x10.proto.TimestampR\ttimestamp\"\xcb\x01\n" +
+	"\ttimestamp\x18\x02 \x01(\v2\x10.proto.TimestampR\ttimestamp\"\x9d\x03\n" +
 	"\rServerMessage\x12>\n" +
 	"\x11register_response\x18\x01 \x01(\v2\x0f.proto.ResponseH\x00R\x10registerResponse\x126\n" +
 	"\rheartbeat_ack\x18\x02 \x01(\v2\x0f.proto.ResponseH\x00R\fheartbeatAck\x127\n" +
-	"\ftask_request\x18\x03 \x01(\v2\x12.proto.TaskRequestH\x00R\vtaskRequestB\t\n" +
-	"\amessage\"\xe2\x01\n" +
+	"\ftask_request\x18\x03 \x01(\v2\x12.proto.TaskRequestH\x00R\vtaskRequest\x12D\n" +
+	"\x0einstall_plugin\x18\x04 \x01(\v2\x1b.proto.InstallPluginRequestH\x00R\rinstallPlugin\x12J\n" +
+	"\x10uninstall_plugin\x18\x05 \x01(\v2\x1d.proto.UninstallPluginRequestH\x00R\x0funinstallPlugin\x12>\n" +
+	"\flist_plugins\x18\x06 \x01(\v2\x19.proto.ListPluginsRequestH\x00R\vlistPluginsB\t\n" +
+	"\amessage\"\xea\x03\n" +
 	"\fAgentMessage\x122\n" +
 	"\bregister\x18\x01 \x01(\v2\x14.proto.AgentRegisterH\x00R\bregister\x120\n" +
 	"\theartbeat\x18\x02 \x01(\v2\x10.proto.HeartbeatH\x00R\theartbeat\x124\n" +
 	"\vtask_result\x18\x03 \x01(\v2\x11.proto.TaskResultH\x00R\n" +
 	"taskResult\x12+\n" +
-	"\btask_log\x18\x04 \x01(\v2\x0e.proto.TaskLogH\x00R\ataskLogB\t\n" +
+	"\btask_log\x18\x04 \x01(\v2\x0e.proto.TaskLogH\x00R\ataskLog\x12V\n" +
+	"\x17install_plugin_response\x18\x05 \x01(\v2\x1c.proto.InstallPluginResponseH\x00R\x15installPluginResponse\x12\\\n" +
+	"\x19uninstall_plugin_response\x18\x06 \x01(\v2\x1e.proto.UninstallPluginResponseH\x00R\x17uninstallPluginResponse\x12P\n" +
+	"\x15list_plugins_response\x18\a \x01(\v2\x1a.proto.ListPluginsResponseH\x00R\x13listPluginsResponseB\t\n" +
 	"\amessage2H\n" +
 	"\fAgentService\x128\n" +
 	"\aConnect\x12\x13.proto.AgentMessage\x1a\x14.proto.ServerMessage(\x010\x01B.Z,github.com/yourusername/agent-platform/protob\x06proto3"
@@ -417,32 +519,44 @@ func file_proto_agent_proto_rawDescGZIP() []byte {
 
 var file_proto_agent_proto_msgTypes = make([]protoimpl.MessageInfo, 4)
 var file_proto_agent_proto_goTypes = []any{
-	(*AgentRegister)(nil), // 0: proto.AgentRegister
-	(*Heartbeat)(nil),     // 1: proto.Heartbeat
-	(*ServerMessage)(nil), // 2: proto.ServerMessage
-	(*AgentMessage)(nil),  // 3: proto.AgentMessage
-	(*Timestamp)(nil),     // 4: proto.Timestamp
-	(*Response)(nil),      // 5: proto.Response
-	(*TaskRequest)(nil),   // 6: proto.TaskRequest
-	(*TaskResult)(nil),    // 7: proto.TaskResult
-	(*TaskLog)(nil),       // 8: proto.TaskLog
+	(*AgentRegister)(nil),           // 0: proto.AgentRegister
+	(*Heartbeat)(nil),               // 1: proto.Heartbeat
+	(*ServerMessage)(nil),           // 2: proto.ServerMessage
+	(*AgentMessage)(nil),            // 3: proto.AgentMessage
+	(*Timestamp)(nil),               // 4: proto.Timestamp
+	(*Response)(nil),                // 5: proto.Response
+	(*TaskRequest)(nil),             // 6: proto.TaskRequest
+	(*InstallPluginRequest)(nil),    // 7: proto.InstallPluginRequest
+	(*UninstallPluginRequest)(nil),  // 8: proto.UninstallPluginRequest
+	(*ListPluginsRequest)(nil),      // 9: proto.ListPluginsRequest
+	(*TaskResult)(nil),              // 10: proto.TaskResult
+	(*TaskLog)(nil),                 // 11: proto.TaskLog
+	(*InstallPluginResponse)(nil),   // 12: proto.InstallPluginResponse
+	(*UninstallPluginResponse)(nil), // 13: proto.UninstallPluginResponse
+	(*ListPluginsResponse)(nil),     // 14: proto.ListPluginsResponse
 }
 var file_proto_agent_proto_depIdxs = []int32{
-	4, // 0: proto.Heartbeat.timestamp:type_name -> proto.Timestamp
-	5, // 1: proto.ServerMessage.register_response:type_name -> proto.Response
-	5, // 2: proto.ServerMessage.heartbeat_ack:type_name -> proto.Response
-	6, // 3: proto.ServerMessage.task_request:type_name -> proto.TaskRequest
-	0, // 4: proto.AgentMessage.register:type_name -> proto.AgentRegister
-	1, // 5: proto.AgentMessage.heartbeat:type_name -> proto.Heartbeat
-	7, // 6: proto.AgentMessage.task_result:type_name -> proto.TaskResult
-	8, // 7: proto.AgentMessage.task_log:type_name -> proto.TaskLog
-	3, // 8: proto.AgentService.Connect:input_type -> proto.AgentMessage
-	2, // 9: proto.AgentService.Connect:output_type -> proto.ServerMessage
-	9, // [9:10] is the sub-list for method output_type
-	8, // [8:9] is the sub-list for method input_type
-	8, // [8:8] is the sub-list for extension type_name
-	8, // [8:8] is the sub-list for extension extendee
-	0, // [0:8] is the sub-list for field type_name
+	4,  // 0: proto.Heartbeat.timestamp:type_name -> proto.Timestamp
+	5,  // 1: proto.ServerMessage.register_response:type_name -> proto.Response
+	5,  // 2: proto.ServerMessage.heartbeat_ack:type_name -> proto.Response
+	6,  // 3: proto.ServerMessage.task_request:type_name -> proto.TaskRequest
+	7,  // 4: proto.ServerMessage.install_plugin:type_name -> proto.InstallPluginRequest
+	8,  // 5: proto.ServerMessage.uninstall_plugin:type_name -> proto.UninstallPluginRequest
+	9,  // 6: proto.ServerMessage.list_plugins:type_name -> proto.ListPluginsRequest
+	0,  // 7: proto.AgentMessage.register:type_name -> proto.AgentRegister
+	1,  // 8: proto.AgentMessage.heartbeat:type_name -> proto.Heartbeat
+	10, // 9: proto.AgentMessage.task_result:type_name -> proto.TaskResult
+	11, // 10: proto.AgentMessage.task_log:type_name -> proto.TaskLog
+	12, // 11: proto.AgentMessage.install_plugin_response:type_name -> proto.InstallPluginResponse
+	13, // 12: proto.AgentMessage.uninstall_plugin_response:type_name -> proto.UninstallPluginResponse
+	14, // 13: proto.AgentMessage.list_plugins_response:type_name -> proto.ListPluginsResponse
+	3,  // 14: proto.AgentService.Connect:input_type -> proto.AgentMessage
+	2,  // 15: proto.AgentService.Connect:output_type -> proto.ServerMessage
+	15, // [15:16] is the sub-list for method output_type
+	14, // [14:15] is the sub-list for method input_type
+	14, // [14:14] is the sub-list for extension type_name
+	14, // [14:14] is the sub-list for extension extendee
+	0,  // [0:14] is the sub-list for field type_name
 }
 
 func init() { file_proto_agent_proto_init() }
@@ -452,16 +566,23 @@ func file_proto_agent_proto_init() {
 	}
 	file_proto_common_proto_init()
 	file_proto_task_proto_init()
+	file_proto_plugin_proto_init()
 	file_proto_agent_proto_msgTypes[2].OneofWrappers = []any{
 		(*ServerMessage_RegisterResponse)(nil),
 		(*ServerMessage_HeartbeatAck)(nil),
 		(*ServerMessage_TaskRequest)(nil),
+		(*ServerMessage_InstallPlugin)(nil),
+		(*ServerMessage_UninstallPlugin)(nil),
+		(*ServerMessage_ListPlugins)(nil),
 	}
 	file_proto_agent_proto_msgTypes[3].OneofWrappers = []any{
 		(*AgentMessage_Register)(nil),
 		(*AgentMessage_Heartbeat)(nil),
 		(*AgentMessage_TaskResult)(nil),
 		(*AgentMessage_TaskLog)(nil),
+		(*AgentMessage_InstallPluginResponse)(nil),
+		(*AgentMessage_UninstallPluginResponse)(nil),
+		(*AgentMessage_ListPluginsResponse)(nil),
 	}
 	type x struct{}
 	out := protoimpl.TypeBuilder{

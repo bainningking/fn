@@ -5,7 +5,7 @@ import (
 )
 
 func TestNewClient(t *testing.T) {
-	client := NewClient("localhost:9090", false)
+	client := NewClient("localhost:9090", false, "test-agent-id")
 	if client == nil {
 		t.Fatal("NewClient returned nil")
 	}

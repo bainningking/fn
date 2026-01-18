@@ -28,7 +28,7 @@ func main() {
 		DBName:   cfg.Database.DBName,
 	}
 
-	_, err = database.Connect(dbCfg)
+	db, err := database.Connect(dbCfg)
 	if err != nil {
 		log.Fatalf("Failed to connect database: %v", err)
 	}
@@ -36,7 +36,7 @@ func main() {
 
 	// 启动 gRPC 服务器
 	grpcAddr := fmt.Sprintf(":%d", cfg.Server.GRPCPort)
-	grpcServer := server.NewServer(grpcAddr)
+	grpcServer := server.NewServer(grpcAddr, db)
 
 	go func() {
 		log.Printf("Starting gRPC server on %s", grpcAddr)

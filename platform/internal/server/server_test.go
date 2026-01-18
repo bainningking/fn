@@ -5,14 +5,14 @@ import (
 )
 
 func TestNewServer(t *testing.T) {
-	srv := NewServer(":50051")
+	srv := NewServer(":50051", nil)
 	if srv == nil {
 		t.Fatal("NewServer returned nil")
 	}
 }
 
 func TestServerStart(t *testing.T) {
-	srv := NewServer(":0")
+	srv := NewServer(":0", nil)
 	if srv == nil {
 		t.Fatal("NewServer returned nil")
 	}
