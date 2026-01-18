@@ -4,20 +4,30 @@ import (
 	"fmt"
 	"net"
 
+	pb "github.com/yourusername/agent-platform/proto"
+	grpcHandler "github.com/yourusername/agent-platform/platform/internal/grpc"
 	"google.golang.org/grpc"
+	"gorm.io/gorm"
 )
 
 type Server struct {
 	addr       string
 	grpcServer *grpc.Server
 	listener   net.Listener
+	db         *gorm.DB
 }
 
-func NewServer(addr string) *Server {
-	return &Server{
+func NewServer(addr string, db *gorm.DB) *Server {
+	s := &Server{
 		addr:       addr,
 		grpcServer: grpc.NewServer(),
+		db:         db,
 	}
+
+	handler := grpcHandler.NewAgentServiceHandler(db)
+	pb.RegisterAgentServiceServer(s.grpcServer, handler)
+
+	return s
 }
 
 func (s *Server) Start() error {
