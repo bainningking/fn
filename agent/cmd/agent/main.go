@@ -24,18 +24,25 @@ func main() {
 	}
 
 	// 创建客户端
-	client := client.NewClient(cfg.Server.Address, cfg.Server.TLS)
+	c := client.NewClient(cfg.Server.Address, cfg.Server.TLS, cfg.Agent.ID)
 
 	// 连接到服务器
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 
-	if err := client.Connect(ctx); err != nil {
+	if err := c.Connect(ctx); err != nil {
 		log.Fatalf("Failed to connect: %v", err)
 	}
-	defer client.Close()
+	defer c.Close()
 
 	log.Printf("Agent %s started", cfg.Agent.ID)
+
+	// 运行客户端
+	go func() {
+		if err := c.Run(context.Background()); err != nil {
+			log.Printf("Client error: %v", err)
+		}
+	}()
 
 	// 等待退出信号
 	sigCh := make(chan os.Signal, 1)
