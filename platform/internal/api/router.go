@@ -37,6 +37,14 @@ func SetupRouter(db *gorm.DB) *gin.Engine {
 			handler := NewMetricHandler(db)
 			metrics.GET("", handler.Query)
 		}
+
+		// 监控和健康检查
+		monitor := api.Group("/monitor")
+		{
+			handler := NewMonitorHandler()
+			monitor.GET("/metrics", handler.GetMetrics)
+			monitor.GET("/health", handler.HealthCheck)
+		}
 	}
 
 	return r

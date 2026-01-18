@@ -11,6 +11,7 @@ import (
 	"github.com/yourusername/agent-platform/platform/internal/config"
 	"github.com/yourusername/agent-platform/platform/internal/database"
 	grpcserver "github.com/yourusername/agent-platform/platform/internal/grpc"
+	"github.com/yourusername/agent-platform/platform/internal/monitor"
 )
 
 func main() {
@@ -37,6 +38,9 @@ func main() {
 		log.Fatalf("Failed to connect database: %v", err)
 	}
 	log.Println("Database connected successfully")
+
+	// 启动监控
+	monitor.StartMonitoring()
 
 	// 启动 gRPC 服务器
 	grpcServer := grpcserver.NewServer(cfg.Server.GRPCPort, db)
