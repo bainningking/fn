@@ -166,6 +166,7 @@ type ServerMessage struct {
 	//
 	//	*ServerMessage_RegisterResponse
 	//	*ServerMessage_HeartbeatAck
+	//	*ServerMessage_TaskRequest
 	Message       isServerMessage_Message `protobuf_oneof:"message"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
@@ -226,6 +227,15 @@ func (x *ServerMessage) GetHeartbeatAck() *Response {
 	return nil
 }
 
+func (x *ServerMessage) GetTaskRequest() *TaskRequest {
+	if x != nil {
+		if x, ok := x.Message.(*ServerMessage_TaskRequest); ok {
+			return x.TaskRequest
+		}
+	}
+	return nil
+}
+
 type isServerMessage_Message interface {
 	isServerMessage_Message()
 }
@@ -238,9 +248,15 @@ type ServerMessage_HeartbeatAck struct {
 	HeartbeatAck *Response `protobuf:"bytes,2,opt,name=heartbeat_ack,json=heartbeatAck,proto3,oneof"`
 }
 
+type ServerMessage_TaskRequest struct {
+	TaskRequest *TaskRequest `protobuf:"bytes,3,opt,name=task_request,json=taskRequest,proto3,oneof"` // 新增：任务下发
+}
+
 func (*ServerMessage_RegisterResponse) isServerMessage_Message() {}
 
 func (*ServerMessage_HeartbeatAck) isServerMessage_Message() {}
+
+func (*ServerMessage_TaskRequest) isServerMessage_Message() {}
 
 // 从 Agent 到管理平台的消息
 type AgentMessage struct {
@@ -249,6 +265,8 @@ type AgentMessage struct {
 	//
 	//	*AgentMessage_Register
 	//	*AgentMessage_Heartbeat
+	//	*AgentMessage_TaskResult
+	//	*AgentMessage_TaskLog
 	Message       isAgentMessage_Message `protobuf_oneof:"message"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
@@ -309,6 +327,24 @@ func (x *AgentMessage) GetHeartbeat() *Heartbeat {
 	return nil
 }
 
+func (x *AgentMessage) GetTaskResult() *TaskResult {
+	if x != nil {
+		if x, ok := x.Message.(*AgentMessage_TaskResult); ok {
+			return x.TaskResult
+		}
+	}
+	return nil
+}
+
+func (x *AgentMessage) GetTaskLog() *TaskLog {
+	if x != nil {
+		if x, ok := x.Message.(*AgentMessage_TaskLog); ok {
+			return x.TaskLog
+		}
+	}
+	return nil
+}
+
 type isAgentMessage_Message interface {
 	isAgentMessage_Message()
 }
@@ -321,15 +357,27 @@ type AgentMessage_Heartbeat struct {
 	Heartbeat *Heartbeat `protobuf:"bytes,2,opt,name=heartbeat,proto3,oneof"`
 }
 
+type AgentMessage_TaskResult struct {
+	TaskResult *TaskResult `protobuf:"bytes,3,opt,name=task_result,json=taskResult,proto3,oneof"` // 新增：任务结果
+}
+
+type AgentMessage_TaskLog struct {
+	TaskLog *TaskLog `protobuf:"bytes,4,opt,name=task_log,json=taskLog,proto3,oneof"` // 新增：任务日志
+}
+
 func (*AgentMessage_Register) isAgentMessage_Message() {}
 
 func (*AgentMessage_Heartbeat) isAgentMessage_Message() {}
+
+func (*AgentMessage_TaskResult) isAgentMessage_Message() {}
+
+func (*AgentMessage_TaskLog) isAgentMessage_Message() {}
 
 var File_proto_agent_proto protoreflect.FileDescriptor
 
 const file_proto_agent_proto_rawDesc = "" +
 	"\n" +
-	"\x11proto/agent.proto\x12\x05proto\x1a\x12proto/common.proto\"\x94\x01\n" +
+	"\x11proto/agent.proto\x12\x05proto\x1a\x12proto/common.proto\x1a\x10proto/task.proto\"\x94\x01\n" +
 	"\rAgentRegister\x12\x19\n" +
 	"\bagent_id\x18\x01 \x01(\tR\aagentId\x12\x1a\n" +
 	"\bhostname\x18\x02 \x01(\tR\bhostname\x12\x0e\n" +
@@ -339,14 +387,18 @@ const file_proto_agent_proto_rawDesc = "" +
 	"\aversion\x18\x06 \x01(\tR\aversion\"V\n" +
 	"\tHeartbeat\x12\x19\n" +
 	"\bagent_id\x18\x01 \x01(\tR\aagentId\x12.\n" +
-	"\ttimestamp\x18\x02 \x01(\v2\x10.proto.TimestampR\ttimestamp\"\x92\x01\n" +
+	"\ttimestamp\x18\x02 \x01(\v2\x10.proto.TimestampR\ttimestamp\"\xcb\x01\n" +
 	"\rServerMessage\x12>\n" +
 	"\x11register_response\x18\x01 \x01(\v2\x0f.proto.ResponseH\x00R\x10registerResponse\x126\n" +
-	"\rheartbeat_ack\x18\x02 \x01(\v2\x0f.proto.ResponseH\x00R\fheartbeatAckB\t\n" +
-	"\amessage\"\x7f\n" +
+	"\rheartbeat_ack\x18\x02 \x01(\v2\x0f.proto.ResponseH\x00R\fheartbeatAck\x127\n" +
+	"\ftask_request\x18\x03 \x01(\v2\x12.proto.TaskRequestH\x00R\vtaskRequestB\t\n" +
+	"\amessage\"\xe2\x01\n" +
 	"\fAgentMessage\x122\n" +
 	"\bregister\x18\x01 \x01(\v2\x14.proto.AgentRegisterH\x00R\bregister\x120\n" +
-	"\theartbeat\x18\x02 \x01(\v2\x10.proto.HeartbeatH\x00R\theartbeatB\t\n" +
+	"\theartbeat\x18\x02 \x01(\v2\x10.proto.HeartbeatH\x00R\theartbeat\x124\n" +
+	"\vtask_result\x18\x03 \x01(\v2\x11.proto.TaskResultH\x00R\n" +
+	"taskResult\x12+\n" +
+	"\btask_log\x18\x04 \x01(\v2\x0e.proto.TaskLogH\x00R\ataskLogB\t\n" +
 	"\amessage2H\n" +
 	"\fAgentService\x128\n" +
 	"\aConnect\x12\x13.proto.AgentMessage\x1a\x14.proto.ServerMessage(\x010\x01B.Z,github.com/yourusername/agent-platform/protob\x06proto3"
@@ -371,20 +423,26 @@ var file_proto_agent_proto_goTypes = []any{
 	(*AgentMessage)(nil),  // 3: proto.AgentMessage
 	(*Timestamp)(nil),     // 4: proto.Timestamp
 	(*Response)(nil),      // 5: proto.Response
+	(*TaskRequest)(nil),   // 6: proto.TaskRequest
+	(*TaskResult)(nil),    // 7: proto.TaskResult
+	(*TaskLog)(nil),       // 8: proto.TaskLog
 }
 var file_proto_agent_proto_depIdxs = []int32{
 	4, // 0: proto.Heartbeat.timestamp:type_name -> proto.Timestamp
 	5, // 1: proto.ServerMessage.register_response:type_name -> proto.Response
 	5, // 2: proto.ServerMessage.heartbeat_ack:type_name -> proto.Response
-	0, // 3: proto.AgentMessage.register:type_name -> proto.AgentRegister
-	1, // 4: proto.AgentMessage.heartbeat:type_name -> proto.Heartbeat
-	3, // 5: proto.AgentService.Connect:input_type -> proto.AgentMessage
-	2, // 6: proto.AgentService.Connect:output_type -> proto.ServerMessage
-	6, // [6:7] is the sub-list for method output_type
-	5, // [5:6] is the sub-list for method input_type
-	5, // [5:5] is the sub-list for extension type_name
-	5, // [5:5] is the sub-list for extension extendee
-	0, // [0:5] is the sub-list for field type_name
+	6, // 3: proto.ServerMessage.task_request:type_name -> proto.TaskRequest
+	0, // 4: proto.AgentMessage.register:type_name -> proto.AgentRegister
+	1, // 5: proto.AgentMessage.heartbeat:type_name -> proto.Heartbeat
+	7, // 6: proto.AgentMessage.task_result:type_name -> proto.TaskResult
+	8, // 7: proto.AgentMessage.task_log:type_name -> proto.TaskLog
+	3, // 8: proto.AgentService.Connect:input_type -> proto.AgentMessage
+	2, // 9: proto.AgentService.Connect:output_type -> proto.ServerMessage
+	9, // [9:10] is the sub-list for method output_type
+	8, // [8:9] is the sub-list for method input_type
+	8, // [8:8] is the sub-list for extension type_name
+	8, // [8:8] is the sub-list for extension extendee
+	0, // [0:8] is the sub-list for field type_name
 }
 
 func init() { file_proto_agent_proto_init() }
@@ -393,13 +451,17 @@ func file_proto_agent_proto_init() {
 		return
 	}
 	file_proto_common_proto_init()
+	file_proto_task_proto_init()
 	file_proto_agent_proto_msgTypes[2].OneofWrappers = []any{
 		(*ServerMessage_RegisterResponse)(nil),
 		(*ServerMessage_HeartbeatAck)(nil),
+		(*ServerMessage_TaskRequest)(nil),
 	}
 	file_proto_agent_proto_msgTypes[3].OneofWrappers = []any{
 		(*AgentMessage_Register)(nil),
 		(*AgentMessage_Heartbeat)(nil),
+		(*AgentMessage_TaskResult)(nil),
+		(*AgentMessage_TaskLog)(nil),
 	}
 	type x struct{}
 	out := protoimpl.TypeBuilder{

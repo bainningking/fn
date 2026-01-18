@@ -1,0 +1,40 @@
+syntax = "proto3";
+
+package proto;
+
+option go_package = "github.com/yourusername/agent-platform/proto";
+
+import "proto/common.proto";
+
+// 任务类型枚举
+enum TaskType {
+  TASK_TYPE_UNSPECIFIED = 0;
+  TASK_TYPE_SHELL = 1;
+  TASK_TYPE_PYTHON = 2;
+}
+
+// 任务请求
+message TaskRequest {
+  string task_id = 1;
+  TaskType type = 2;
+  string script = 3;
+  int32 timeout = 4;  // 秒
+  map<string, string> env = 5;  // 环境变量
+}
+
+// 任务执行结果
+message TaskResult {
+  string task_id = 1;
+  int32 exit_code = 2;
+  string stdout = 3;
+  string stderr = 4;
+  Timestamp completed_at = 5;
+}
+
+// 任务执行日志（流式）
+message TaskLog {
+  string task_id = 1;
+  string output = 2;
+  bool is_stderr = 3;
+  Timestamp timestamp = 4;
+}

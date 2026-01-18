@@ -5,6 +5,7 @@ package proto;
 option go_package = "github.com/yourusername/agent-platform/proto";
 
 import "proto/common.proto";
+import "proto/task.proto";
 
 // Agent 注册信息
 message AgentRegister {
@@ -27,6 +28,7 @@ message ServerMessage {
   oneof message {
     Response register_response = 1;
     Response heartbeat_ack = 2;
+    TaskRequest task_request = 3;  // 新增：任务下发
   }
 }
 
@@ -35,6 +37,8 @@ message AgentMessage {
   oneof message {
     AgentRegister register = 1;
     Heartbeat heartbeat = 2;
+    TaskResult task_result = 3;  // 新增：任务结果
+    TaskLog task_log = 4;  // 新增：任务日志
   }
 }
 
