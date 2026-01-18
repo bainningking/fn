@@ -26,7 +26,7 @@ func Connect(cfg *Config) (*gorm.DB, error) {
 	}
 
 	// 自动迁移
-	if err := db.AutoMigrate(&models.Agent{}, &models.Task{}, &models.Metric{}); err != nil {
+	if err := db.AutoMigrate(&models.Agent{}, &models.Task{}, &models.Metric{}, &models.AuditLog{}); err != nil {
 		return nil, fmt.Errorf("failed to migrate: %w", err)
 	}
 

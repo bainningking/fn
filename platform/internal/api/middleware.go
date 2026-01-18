@@ -1,10 +1,13 @@
 package api
 
 import (
+	"strconv"
 	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/sirupsen/logrus"
+	"github.com/yourusername/agent-platform/platform/internal/audit"
+	"github.com/yourusername/agent-platform/platform/internal/models"
 )
 
 func Logger() gin.HandlerFunc {
@@ -34,5 +37,22 @@ func CORS() gin.HandlerFunc {
 		}
 
 		c.Next()
+	}
+}
+
+func AuditLog(auditService *audit.Service) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		c.Next()
+
+		log := &models.AuditLog{
+			UserID:    c.GetString("user_id"),
+			Action:    c.Request.Method + " " + c.Request.URL.Path,
+			Resource:  c.Request.URL.Path,
+			IP:        c.ClientIP(),
+			UserAgent: c.Request.UserAgent(),
+			Status:    strconv.Itoa(c.Writer.Status()),
+		}
+
+		auditService.Log(log)
 	}
 }
