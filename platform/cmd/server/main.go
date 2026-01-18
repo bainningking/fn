@@ -7,6 +7,7 @@ import (
 	"os/signal"
 	"syscall"
 
+	"github.com/yourusername/agent-platform/platform/internal/api"
 	"github.com/yourusername/agent-platform/platform/internal/config"
 	"github.com/yourusername/agent-platform/platform/internal/database"
 	"github.com/yourusername/agent-platform/platform/internal/server"
@@ -42,6 +43,15 @@ func main() {
 		log.Printf("Starting gRPC server on %s", grpcAddr)
 		if err := grpcServer.Start(); err != nil {
 			log.Fatalf("Failed to start gRPC server: %v", err)
+		}
+	}()
+
+	// 启动 HTTP API 服务器
+	router := api.SetupRouter(db)
+	go func() {
+		log.Println("Starting HTTP server on :8080")
+		if err := router.Run(":8080"); err != nil {
+			log.Fatalf("Failed to start HTTP server: %v", err)
 		}
 	}()
 

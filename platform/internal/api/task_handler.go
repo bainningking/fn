@@ -19,7 +19,7 @@ func NewTaskHandler(db *gorm.DB) *TaskHandler {
 type CreateTaskRequest struct {
 	AgentID string `json:"agent_id" binding:"required"`
 	Type    string `json:"type" binding:"required"`
-	Content string `json:"content" binding:"required"`
+	Script  string `json:"script" binding:"required"`
 	Timeout int    `json:"timeout"`
 }
 
@@ -33,7 +33,7 @@ func (h *TaskHandler) Create(c *gin.Context) {
 	task := &models.Task{
 		AgentID: req.AgentID,
 		Type:    req.Type,
-		Content: req.Content,
+		Script:  req.Script,
 		Timeout: req.Timeout,
 		Status:  "pending",
 	}
